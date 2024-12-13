@@ -2,8 +2,10 @@ package com.example.demo.controller;
 
 import com.example.demo.AnswerForm;
 import com.example.demo.QuestionForm;
+import com.example.demo.entity.Answer;
 import com.example.demo.entity.Question;
 import com.example.demo.entity.SiteUser;
+import com.example.demo.service.AnswerService;
 import com.example.demo.service.QuestionService;
 import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
@@ -27,6 +29,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final UserService userService;
+    private final AnswerService answerService;
 
     @GetMapping("/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
@@ -38,9 +41,12 @@ public class QuestionController {
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
+    public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm,
+                         @RequestParam(value = "answer_page", defaultValue = "0") int page) {
         Question question = questionService.getQuestion(id);
+        Page<Answer> paging = answerService.getList(question, page);
         model.addAttribute("question", question);
+        model.addAttribute("answer_paging", paging);
         return "question_detail";
     }
 

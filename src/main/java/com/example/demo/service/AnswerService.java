@@ -6,6 +6,9 @@ import com.example.demo.entity.Question;
 import com.example.demo.entity.SiteUser;
 import com.example.demo.repository.AnswerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,6 +37,11 @@ public class AnswerService {
         } else {
             throw new DataNotFoundException("answer not found");
         }
+    }
+
+    public Page<Answer> getList(Question question, int page) {
+        Pageable pageable = PageRequest.of(page, 5);
+        return answerRepository.findByQuestion(question, pageable);
     }
 
     public void modify(Answer answer, String content) {

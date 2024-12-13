@@ -39,7 +39,7 @@
         <h5 class="border-bottom my-3 py-2"
             th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
         <!-- 답변 반복 시작 -->
-        <div class="card my-3" th:each="answer : ${question.answerList}">
+        <div class="card my-3" th:each="answer, loop: ${answer_paging}">
             <a th:id="|answer_${answer.id}|"></a>
             <div class="card-body">
                 <div class="card-text" th:utext="${@commonUtil.markdown(answer.content)}"></div>
@@ -73,6 +73,29 @@
             </div>
         </div>
         <!-- 답변 반복 끝  -->
+        <!-- 답변 페이징 처리 -->
+        <div th:if="${!answer_paging.isEmpty()}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!answer_paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{|?answer_page=${answer_paging.number-1}|}">
+                        <span>이전</span>
+                    </a>
+                </li>
+                <li th:each="page: ${#numbers.sequence(0, answer_paging.totalPages-1)}"
+                    th:if="${page >= answer_paging.number - 5 and page <= answer_paging.number + 5}"
+                    th:classappend="${page == answer_paging.number} ? 'active'"
+                    class="page-item">
+                    <a th:text="${page}" class="page-link" th:href="@{|?answer_page=${page}|}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!answer_paging.hasNext} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?answer_page=${answer_paging.number+1}|}">
+                        <span>다음</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- 답변 페이징처리 끝 -->
         <!-- 답변 작성 -->
         <form th:action="@{|/answer/create/${question.id}|}" th:object="${answerForm}" method="post" class="my-3">
             <div th:replace="~{form_errors :: formErrorsFragment}"></div>
